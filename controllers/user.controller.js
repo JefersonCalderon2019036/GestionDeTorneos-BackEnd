@@ -224,40 +224,17 @@ function updateUser(req, res) {
 
 function deleteUser(req, res) {
     let userId = req.params.idU;
-    let params = req.body;
 
-    if (userId != req.user.sub) {
-        res.status(403).send({ message: 'No tienes permisos para Eliminar otro usuario' });
-    } else {
-        User.findOne({ _id: userId }, (err, userFind) => {
-            if (err) {
-                res.status(500).send({ message: 'Error general' });
-                console.log(err);
-            } else if (userFind) {
-                bcrypt.compare(params.password, userFind.password, (err, passVerified) => {
-                    if (err) {
-                        res.status(500).send({ message: 'Error general al veficar la contraseña' })
-                        console.log(err)
-                    } else if (passVerified) {
-                        User.findByIdAndRemove(userId, (err, userRemoved) => {
-                            if (err) {
-                                res.status(500).send({ message: 'Error general al eliminar el usuario' });
-                                console.log(err);
-                            } if (userRemoved) {
-                                res.send({ message: 'Usuario eliminado', userRemoved })
-                            } else {
-                                res.send({ message: 'Usuario no eliminado' });
-                            }
-                        })
-                    } else {
-                        res.status(401).send({ message: 'Contraseña incorrecta' })
-                    }
-                })
-            } else {
-                res.status(404).send({ message: 'Usuario no existente' })
-            }
-        })
-    }
+    User.findByIdAndRemove(userId, (err, userRemoved) => {
+        if (err) {
+            res.status(500).send({ message: 'Error general al eliminar el usuario' });
+            console.log(err);
+        } if (userRemoved) {
+            res.send({ message: 'Usuario eliminado', userRemoved })
+        } else {
+            res.send({ message: 'Usuario no eliminado' });
+        }
+    })
 }
 
 /*function uploadImage(req, res) {
@@ -340,15 +317,18 @@ function deleteUserAdmin (req, res){
         if(userGetId.role != "ROLE_ADMIN"){
             return res.status(500).send({ message: "No tiene permisos para eliminar este usuario"})
         }else{
-            User.findOneAndDelete(idUserDelete, (err, userDelete) =>{
-                if(err) return res.status(500).send({mensaje: 'Error en la peticion'})
-                if(!userDelete) return res.status(200).send({mensaje: 'No se ha podido eliminar usuario'})
-        
-                return res.status(200).send({mensaje: 'Se elemino de forma correcta el usuario con id:' + idUser})
+            User.findByIdAndDelete(idUserDelete, (err, userRemoved) => {
+                if (err) {
+                    res.status(500).send({ message: 'Error general al eliminar el usuario' });
+                    console.log(err);
+                } if (userRemoved) {
+                    res.send({ message: 'Usuario eliminado', userRemoved })
+                } else {
+                    res.send({ message: 'Usuario no eliminado' });
+                }
             })
         }
     })
-
 }
 
 function updateUserAdmin (req, res){
@@ -363,11 +343,10 @@ function updateUserAdmin (req, res){
         if(userGetId.role != "ROLE_ADMIN"){
             return res.status(500).send({ message: "No tiene permisos para eliminar este usuario"})
         }else{
-            User.findByIdAndUpdate(idupdate, params, { new: true }, (err, usuarioActualizado)=>{
-                if(err) return res.status(500).send({ mensaje: 'Error en la peticion' });
-                if(!usuarioActualizado) return res.status(500).send({ mensaje: 'No se ha podido actualizar al Usuario' });
-                // usuarioActualizado.password = undefined;
-                return res.status(200).send({ usuarioActualizado });
+            User.findByIdAndUpdate(idupdate, params, { new: true }, (err, userUpdated) => {
+                if(err) return res.status(500).send({Mensaje: "Error en la peticion de edición"})
+                if(!userUpdated) return res.status(404).send({mensaje: "No se pudo actualizar tu usuario"})
+                return res.status(200).send(userUpdated)
             })
         }
     })
