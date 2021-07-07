@@ -179,8 +179,18 @@ function deleteTeam(req, res) {
     }
 }
 
+function getteamid(req,res){
+    var teamsid = req.params.teamsid;
+    Team.findOne({$or: [{_id: teamsid}]}).exec((err, userGetId)=>{
+        if(err) return res.status(500).send({mensaje: 'Error en la peticion'})
+        if(!userGetId) return res.status(404).send({mensaje: 'Error al obtener los datos del equipo'})
+        return res.status(200).send(userGetId)
+    })
+}
+
 module.exports = {
     createTeam,
     updateTeam,
-    deleteTeam
+    deleteTeam,
+    getteamid
 }

@@ -11,5 +11,6 @@ var api = express.Router();
 api.post('/:idL/saveTeam/:idU', [mdAuth.ensureAuth], teamController.createTeam);
 api.put('/:idU/updateTeam/:idL/:idT', [mdAuth.ensureAuth], teamController.updateTeam)
 api.put('/:idU/deleteTeam/:idL/:idT', [mdAuth.ensureAuth], teamController.deleteTeam)
+api.get('/getteamid/:teamsid', [mdAuth.ensureAuth], teamController.getteamid)
 
 module.exports = api;
